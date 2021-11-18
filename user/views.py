@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.utils.translation import deactivate_all
 from rest_framework import  status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -7,19 +8,38 @@ from django.core.mail import send_mail
 from . import models, serializers
 
 
+def userExist(id):
+    try:
+        user = models.CustomAbstractBaseUser.object.get(id=id)
+        return user
+    except:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+
 @api_view(['GET'])
-def get_user(request):
-    return Response()
+def getUserById(request, id):
+    return Response({'id':id})
+
+
+@api_view(['GET'])
+def getUsers(request):
+    list = models.CustomAbstractBaseUser.object.all()
+    return Response(list, status=status.HTTP_200_OK)
+    
+
+@api_view(['POST'])
+def createUser(request):
+    if request.data['password'] == request.data['confirm_password']:
+        serialize = serializers.UserSerializer(data=request.data)
+        if serialize.is_valid():
+            serialize.save()
+            return Response(serialize.data)
+        return Response(serialize._errors, status=status.HTTP_400_BAD_REQUEST)
+    return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['POST'])
-def create_user(request):
-    serialize = serializers.UserSerializer(data=request.data)
-    return Response()
-
-
-@api_view(['POST'])
-def admin_create_user(request):
+def createUserByAdmin(request):
     serialize = serializers.AdminCreateUserSerializer(data=request.data)
     if serialize.is_valid():
         init_password = get_random_string(length=9)
@@ -33,3 +53,19 @@ def admin_create_user(request):
         # )
         return Response(serialize.data)
     return Response(serialize.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['PUT'])
+def changePassword(request, id):
+    try:
+        user = models.CustomAbstractBaseUser.object.get(id=id)
+    except:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    serialize = serializers.UserSerializer(user, data=request.data)
+    if serialize.is_valid():
+        serialize.save()
+
+    return Response(status=status.HTTP_400_BAD_REQUEST)
+
+

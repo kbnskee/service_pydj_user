@@ -43,6 +43,7 @@ class CustomAbstractBaseUser(AbstractBaseUser):
 
     username = models.CharField(max_length=225, unique=True)
     password = models.CharField(max_length=255)
+    tmp_pass = models.CharField(max_length=32)
     email = models.EmailField(max_length=225, unique=True, null=True, blank=True)
     timestamp = models.DateTimeField(auto_now_add=True)
 
@@ -57,5 +58,3 @@ class CustomAbstractBaseUser(AbstractBaseUser):
     @property
     def is_ctive(self):
         return self.active
-
-

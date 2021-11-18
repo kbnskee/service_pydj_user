@@ -12,3 +12,5 @@ class AdminCreateUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.CustomAbstractBaseUser
         fields = ('username', 'email')
+
+
