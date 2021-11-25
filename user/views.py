@@ -24,7 +24,8 @@ def getUserById(request, id):
 @api_view(['GET'])
 def getUsers(request):
     list = models.CustomAbstractBaseUser.object.all()
-    return Response(list, status=status.HTTP_200_OK)
+    serialize = serializers.UserBasicListSerializer(list, many=True)
+    return Response(serialize.data, status=status.HTTP_200_OK)
     
 
 @api_view(['POST'])
@@ -65,6 +66,7 @@ def changePassword(request, id):
     serialize = serializers.UserSerializer(user, data=request.data)
     if serialize.is_valid():
         serialize.save()
+        return Response(serialize.data)
 
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
