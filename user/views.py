@@ -1,3 +1,4 @@
+from os import stat
 from django.shortcuts import render
 from django.utils.translation import deactivate_all
 from rest_framework import  status
@@ -8,23 +9,30 @@ from django.core.mail import send_mail
 from . import models, serializers
 
 
-def userExist(id):
+@api_view(['GET'])
+def getUserById(request, id):
     try:
         user = models.CustomAbstractBaseUser.object.get(id=id)
-        return user
     except:
         return Response(status=status.HTTP_404_NOT_FOUND)
+    serialize = serializers.UserBasicInfoSerializer(user)
+    return Response(serialize.data, status=status.HTTP_200_OK)
 
 
 @api_view(['GET'])
-def getUserById(request, id):
-    return Response({'id':id})
+def getUserByUsername(request, username):
+    try:
+        user = models.CustomAbstractBaseUser.object.get(username=username)
+    except:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    serialize = serializers.UserBasicInfoSerializer(user)
+    return Response(serialize.data, status=status.HTTP_200_OK)
 
 
 @api_view(['GET'])
 def getUsers(request):
     list = models.CustomAbstractBaseUser.object.all()
-    serialize = serializers.UserBasicListSerializer(list, many=True)
+    serialize = serializers.UserBasicInfoSerializer(list, many=True)
     return Response(serialize.data, status=status.HTTP_200_OK)
     
 
@@ -62,12 +70,8 @@ def changePassword(request, id):
         user = models.CustomAbstractBaseUser.object.get(id=id)
     except:
         return Response(status=status.HTTP_404_NOT_FOUND)
-
     serialize = serializers.UserSerializer(user, data=request.data)
     if serialize.is_valid():
         serialize.save()
         return Response(serialize.data)
-
     return Response(status=status.HTTP_400_BAD_REQUEST)
-
-

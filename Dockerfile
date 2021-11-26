@@ -14,4 +14,6 @@ RUN pip install -r requirements.txt
 
 RUN pip install -r package.txt
 
+EXPOSE 20101
+
 COPY . /service_pydj_user

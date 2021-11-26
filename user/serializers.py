@@ -16,9 +16,9 @@ class AdminCreateUserSerializer(serializers.ModelSerializer):
         fields = ('username', 'email')
 
 
-class UserBasicListSerializer(serializers.ModelSerializer):
+class UserBasicInfoSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.CustomAbstractBaseUser
-        fields = ('username', 'email')
+        fields = ('id', 'username', 'email')
 
 
